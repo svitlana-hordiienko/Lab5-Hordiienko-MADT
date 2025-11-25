@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class DataLoader {
 
-    //downloads and parses EUR-based exchange rates
+    //downloads and parses EUR-based exchange rates using the floatrates eur.xml
     public ArrayList<String> loadRates() {
         ArrayList<String> rates = new ArrayList<>();
 

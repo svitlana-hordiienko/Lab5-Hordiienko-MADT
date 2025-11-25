@@ -1,5 +1,6 @@
 package com.example.lab5_hordiienko_madt;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,7 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private Spinner ratesFilter;
     private ListView listOfRates;
 
-    private ArrayList<String> filterOptions = new ArrayList<>();
+    private ArrayList<String> allRates = new ArrayList<>(); //full data
+    private ArrayList<String> filterOptions = new ArrayList<>(); //filtered view
+
     private ArrayAdapter<String> listAdapter;
     private DataLoader dataLoader = new DataLoader();
 
@@ -65,48 +68,64 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //rates loader
     private void loadRates() {
-        new Thread(() -> {
-            filterOptions = dataLoader.loadRates();
+        new LoadRatesTask().execute();
+    }
+
+    //async tasks for loading rates as well as loading the filtering options
+    private class LoadRatesTask extends AsyncTask<Void, Void, ArrayList<String>> {
+
+        @Override
+        protected ArrayList<String> doInBackground(Void... voids) {
+            return dataLoader.loadRates();
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> rates) {
+            allRates = new ArrayList<>(rates);
+
+            //debugger, need to be viewed through logcat for results
             for (String r : filterOptions) {
                 System.out.println(r);
             }
-            runOnUiThread(() -> {
-                setupListView();
-                filterList();
-                    });
-        }).start();
+
+            filterOptions.clear();
+            filterOptions.addAll(rates);
+            setupListView();
+            filterList();
+        }
     }
 
+    //listview setup function
     private void setupListView() {
-        new Thread(() -> {
-            List<String> rates = dataLoader.loadRates();
-
-            // Update UI on main thread
-            runOnUiThread(() -> {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                        MainActivity.this,
-                        android.R.layout.simple_list_item_1,
-                        rates
-                );
-                listOfRates.setAdapter(adapter);
-            });
-        }).start();
-
+        listAdapter = new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                filterOptions
+        );
+        listOfRates.setAdapter(listAdapter);
     }
 
+    //filtering function with an emdash as a splitter, shows all rates if "all" is chosen
+    //to avoid errors, there is the initial allRates list used
     private void filterList() {
         if (listAdapter == null) return;
 
-        String selected = ratesFilter.getSelectedItem().toString();
+        String selected = ratesFilter.getSelectedItem().toString().trim();
         ArrayList<String> filtered = new ArrayList<>();
 
-        for (String rate : filterOptions) {
-            String code = rate.split("–")[0].trim(); //split by dash
-            if (selected.equals("All") || code.equalsIgnoreCase(selected)) {
+        for (String rate : allRates) {
+            String[] parts = rate.split("–"); //split by dash
+
+            if (parts.length < 2) continue; //safety check
+            String code = parts[0].trim();
+
+            if (selected.equalsIgnoreCase("All") || code.equalsIgnoreCase(selected)) {
                 filtered.add(rate);
             }
         }
+
         listAdapter.clear();
         listAdapter.addAll(filtered);
         listAdapter.notifyDataSetChanged();

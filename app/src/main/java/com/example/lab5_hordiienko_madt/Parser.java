@@ -15,7 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class Parser {
 
-    //code written based on the professor's example
+    //code written based on the professor's example, adjusted to produce an array of strings instead of one string
     public static ArrayList<String> getCurrencyRatesEur(InputStream stream) throws IOException {
         ArrayList<String> resultsList = new ArrayList<>();
         try {

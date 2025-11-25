@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--currency options, same as the "targetCurrency" in the api-->
     <string-array name="currency_list">
         <item>All</item>
         <item>USD</item>
