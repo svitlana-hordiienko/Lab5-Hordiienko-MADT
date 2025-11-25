@@ -48,7 +48,7 @@
         <ListView
             android:id="@+id/listOfRates"
             android:layout_width="match_parent"
-            android:layout_height="600dp"
+            android:layout_height="700dp"
             tools:layout_editor_absoluteY="325dp" />
 
     </LinearLayout>
