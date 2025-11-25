@@ -1,6 +1,8 @@
 package com.example.lab5_hordiienko_madt;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -11,7 +13,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    private Spinner ratesFilter;
+    private ListView listOfRates;
+
+    private ArrayList<String> filterOptions = new ArrayList<>();
+    private ArrayAdapter<String> listAdapter;
+    private DataLoader dataLoader = new DataLoader();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,16 +36,79 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        ListView listOfRates = findViewById(R.id.listOfRates);
-        Spinner ratesFilter = findViewById(R.id.ratesFilter);
+        listOfRates = findViewById(R.id.listOfRates);
+        ratesFilter = findViewById(R.id.ratesFilter);
 
+        setupSpinner();
+        loadRates();
+    }
+
+    private void setupSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
-                R.array.currency_list,
+                R.array.currency_list, //string-array resource
                 android.R.layout.simple_spinner_item
         );
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ratesFilter.setAdapter(adapter);
+        ratesFilter.setSelection(0); //all
+
+        ratesFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filterList();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void loadRates() {
+        new Thread(() -> {
+            filterOptions = dataLoader.loadRates();
+            for (String r : filterOptions) {
+                System.out.println(r);
+            }
+            runOnUiThread(() -> {
+                setupListView();
+                filterList();
+                    });
+        }).start();
+    }
+
+    private void setupListView() {
+        new Thread(() -> {
+            List<String> rates = dataLoader.loadRates();
+
+            // Update UI on main thread
+            runOnUiThread(() -> {
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        MainActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        rates
+                );
+                listOfRates.setAdapter(adapter);
+            });
+        }).start();
+
+    }
+
+    private void filterList() {
+        if (listAdapter == null) return;
+
+        String selected = ratesFilter.getSelectedItem().toString();
+        ArrayList<String> filtered = new ArrayList<>();
+
+        for (String rate : filterOptions) {
+            String code = rate.split("–")[0].trim(); //split by dash
+            if (selected.equals("All") || code.equalsIgnoreCase(selected)) {
+                filtered.add(rate);
+            }
+        }
+        listAdapter.clear();
+        listAdapter.addAll(filtered);
+        listAdapter.notifyDataSetChanged();
     }
 }

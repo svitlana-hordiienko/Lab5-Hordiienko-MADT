@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,25 +16,25 @@ import javax.xml.parsers.ParserConfigurationException;
 public class Parser {
 
     //code written based on the professor's example
-    public static String getCurrencyRatesEur(InputStream stream) throws IOException {
-        String result = new String();
+    public static ArrayList<String> getCurrencyRatesEur(InputStream stream) throws IOException {
+        ArrayList<String> resultsList = new ArrayList<>();
         try {
             DocumentBuilderFactory xmlDocFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder xmlDocBuilder = xmlDocFactory.newDocumentBuilder();
             Document doc = xmlDocBuilder.parse(stream);
 
             NodeList rateNodes = doc.getElementsByTagName("item");
-            for (int i = 0; i < rateNodes.getLength(); ++i) {
+            for (int i = 0; i < rateNodes.getLength(); i++) {
                 Element rateNode = (Element) rateNodes.item(i);
-                String currencyName = rateNode.getElementsByTagName("targetCurrency").item(0).getFirstChild().getNodeValue();
-                String rate = rateNode.getElementsByTagName("exchangeRate").item(0).getFirstChild().getNodeValue();
-                result += (String.format("Currency name: %s, rate %s \n", currencyName, rate));
+                String code = rateNode.getElementsByTagName("targetCurrency").item(0).getTextContent().trim();
+                String rate = rateNode.getElementsByTagName("exchangeRate").item(0).getTextContent().trim();
+
+                resultsList.add(code + " – " + rate);
             }
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
-        return result;
+
+        return resultsList;
     }
 }
