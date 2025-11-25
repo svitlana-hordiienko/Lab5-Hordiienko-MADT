@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Lab5-Hordiienko-MADT</string>
+    <string name="app_header">Currency Rates App</string>
+    <string name="currency_list_header">Filtered Rates List</string>
 </resources>
