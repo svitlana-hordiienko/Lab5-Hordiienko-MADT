@@ -19,14 +19,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Spinner ratesFilter;
-    private ListView listOfRates;
+    Spinner ratesFilter;
+    ListView listOfRates;
 
-    private ArrayList<String> allRates = new ArrayList<>(); //full data
-    private ArrayList<String> filterOptions = new ArrayList<>(); //filtered view
+    ArrayList<String> allRates = new ArrayList<>(); //full data
+    ArrayList<String> filterOptions = new ArrayList<>(); //filtered view
 
-    private ArrayAdapter<String> listAdapter;
-    private DataLoader dataLoader = new DataLoader();
+    ArrayAdapter<String> listAdapter;
+    DataLoader dataLoader = new DataLoader();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         loadRates();
     }
 
-    private void setupSpinner() {
+    public void setupSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
                 R.array.currency_list, //string-array resource
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //rates loader
-    private void loadRates() {
+    public void loadRates() {
         new LoadRatesTask().execute();
     }
 
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //listview setup function
-    private void setupListView() {
+    public void setupListView() {
         listAdapter = new ArrayAdapter<>(
                 MainActivity.this,
                 android.R.layout.simple_list_item_1,
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
     //filtering function with an emdash as a splitter, shows all rates if "all" is chosen
     //to avoid errors, there is the initial allRates list used
-    private void filterList() {
+    public void filterList() {
         if (listAdapter == null) return;
 
         String selected = ratesFilter.getSelectedItem().toString().trim();

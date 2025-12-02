@@ -26,6 +26,12 @@ public class Parser {
             NodeList rateNodes = doc.getElementsByTagName("item");
             for (int i = 0; i < rateNodes.getLength(); i++) {
                 Element rateNode = (Element) rateNodes.item(i);
+
+                if (rateNode.getElementsByTagName("targetCurrency").item(0) == null ||
+                        rateNode.getElementsByTagName("exchangeRate").item(0) == null) {
+                    continue; //skip invalid item
+                }
+
                 String code = rateNode.getElementsByTagName("targetCurrency").item(0).getTextContent().trim();
                 String rate = rateNode.getElementsByTagName("exchangeRate").item(0).getTextContent().trim();
 
